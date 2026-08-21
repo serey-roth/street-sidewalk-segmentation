@@ -6,7 +6,7 @@ Pre-trained segmentation models, such as DeepLabV3+, are effective at classifyin
 
 This project combines those two approaches into an analysis pipeline for pedestrian sidewalk safety. First, we run pre-trained semantic segmentation with DeepLabV3+ and then perform VLM-based safety assessment with Qwen2.5-VL models. The goal is to evaluate how accurately general-purpose VLMs examine pedestrian sidewalk quality and to what extent they can complement segmentation models in fine-grained scene understanding. 
 
-For our analysis, we use HuggingFace's `segments/sidewalk-semantic` [dataset](https://huggingface.co/datasets/segments/sidewalk-semantic), which consists of street-level pedestrian sidewalk images from Belgium in the summer of 2021. For our models, we use `DeepLabV3-ResNet50` for semantic segmentation and `Qwen2.5-VL-3B-Instruct` and `Qwen2.5-VL-7B-Instruct` for VLM scoring.
+For our analysis, we use HuggingFace's `segments/sidewalk-semantic` [dataset](https://huggingface.co/datasets/segments/sidewalk-semantic), which consists of street-level pedestrian sidewalk images from Belgium in the summer of 2021. For our models, we use `DeepLabV3-ResNet50` for semantic segmentation and `Qwen2.5-VL-3B-Instruct` and `Qwen2.5-VL-7B-Instruct` for VLM assessment.
 
 ## Findings
 
