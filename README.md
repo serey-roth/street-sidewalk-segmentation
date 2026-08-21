@@ -1,31 +1,28 @@
-# Street Sidewalk Semantic Image Segmentation with DeepLabV3 and Qwen2.5-vl Models
+# Dual-Pipeline Analysis for Pedestrian Sidewalk Safety with DeepLabV3 Segmentation and Qwen2.5-VL Safety Assessment
 
 ## Overview
-Understanding the environment around the sidewalks is crucial to determining pedestrian safety. Pre-trained segmentation models, such as DeepLabV3+, are effective at classifying pixel-level details, but are limited to categories in their original training data. Fine-tuning the models to recognize new categories is a possible solution, though it requires annotated training labels for the target images. Vision-Language Models (VLMs) are effective at identifying "what's in an image" through natural-language processing, but are limited due to a lack of spatial reasoning.
+Pre-trained segmentation models, such as DeepLabV3+, are effective at classifying pixel-level details, but are limited to categories in their original training data. Fine-tuning the models to recognize new categories is a possible solution, though it requires annotated training labels for the target images. Vision-Language Models (VLMs) are effective at identifying "what's in an image" through natural-language processing, but are limited due to a lack of spatial reasoning.
 
-This project combines those two approaches into an analysis pipeline for pedestrian sidewalk safety. First, we run pre-trained semantic segmentation with DeepLabV3+ and then perform VLM-based qualitative scoring with Qwen2.5-VL models. The goal is to evaluate how accurately general-purpose VLMs examine pedestrian sidewalk quality and to what extent they can complement segmentation models in fine-grained scene understanding. 
+This project combines those two approaches into an analysis pipeline for pedestrian sidewalk safety. First, we run pre-trained semantic segmentation with DeepLabV3+ and then perform VLM-based safety assessment with Qwen2.5-VL models. The goal is to evaluate how accurately general-purpose VLMs examine pedestrian sidewalk quality and to what extent they can complement segmentation models in fine-grained scene understanding. 
 
-For our analysis, we use HuggingFace's `segments/sidewalk-semantic` dataset (https://huggingface.co/datasets/segments/sidewalk-semantic), which consists of street-level pedestrian sidewalk images from Belgium in the summer of 2021. For our models, we use `DeepLabV3-ResNet50` for semantic segmentation and `Qwen2.5-VL-3B-Instruct` and `Qwen2.5-VL-7B-Instruct` for VLM scoring.
+For our analysis, we use HuggingFace's `segments/sidewalk-semantic` [dataset](https://huggingface.co/datasets/segments/sidewalk-semantic), which consists of street-level pedestrian sidewalk images from Belgium in the summer of 2021. For our models, we use `DeepLabV3-ResNet50` for semantic segmentation and `Qwen2.5-VL-3B-Instruct` and `Qwen2.5-VL-7B-Instruct` for VLM scoring.
 
 ## Findings
 
 ### DeepLabV3-segmented classes vs. Pre-labeled classes
 We evaluated `DeepLabV3-ResNet50` model, which is trained on COCO/Pascal VOC's 20 general object classes, against the `sidewalk-semantic` dataset labels (34 sidewalk-specific classes e.g. `flat-walk`, `flat-curb`, `flat-crosswalk`).
 
-Across 3 sample images, we found that the model identified only `background` and `car` and none of the sidewalk-relevant classes (such as curb, road, building, vegetation). 
+Across 3 sample images, we found that the model identified only `background` and `car` and none of the sidewalk-relevant classes (such as `flat-curb`, `flat-road`, `flat-parkingdriveway`, `nature-vegetation`, etc). 
 
 <img width="954" height="300" alt="Screenshot 2026-08-20 at 2 13 46 PM" src="https://github.com/user-attachments/assets/eef233ff-f713-490f-8c28-eedceea09ee2" />
 
-### VLM scoring with Qwen2.5-VL
-We evaluated Qwen2.5-VL on three qualitative scores per image: `perceived_safety`, `lighting_quality`, and `obstructions`, using a structured JSON prompt.
+### VLM-based safety assessment with Qwen2.5-VL
+We evaluated 2 Qwen2.5-VL models (`Qwen2.5-VL-3B-Instruct` and `Qwen2.5-VL-7B-Instruct`) on three scores per image: `perceived_safety`, `lighting_quality`, and `obstructions`, using a structured JSON prompt.
 
-We tested several iterations of the prompt and found:
-- Defining specific obstruction rules got rid of hallucinated obstructions (e.g. flagging garden wall as blocking the path)
-- Adding spatial reference (by defining the walkable surface from the pedestrian POV) improved obstruction accuracy
-
-We evaluated `Qwen2.5-VL-3B-Instruct` and `Qwen2.5-VL-7B-Instruct`, and found that:
-- The 3B model misidentified the orange pole as an obstruction in the first image even though it's faraway in the distance.
-- The 3B model scored pretty low (2/5) across all 3 sample images, even though pictures are well-lit.
+We found that
+- Adding spatial reference and defining the walkable surface from the pedestrian POV improved obstruction accuracy and got rid of hallucinated obstructions (e.g. flagging garden wall as blocking the path)
+- The 3B model misidentified the orange pole as an obstruction in the first image even though it's faraway in the distance
+- The 3B model scored pretty low (2/5) across all 3 sample images, even though pictures are well-lit and bright
 
 This is the final iteration of the prompt:
 ```
@@ -56,9 +53,14 @@ Respond ONLY in this exact JSON format, no other text:
 
 ## Limitations
 
-- All models used (`DeepLabV3-ResNet50`, `Qwen2.5-VL-3B/7B-Instruct`) are pretrained and used as-is. We did not train or fine-tune the models on the `sidewalk-semantic` dataset itself.
+- We used the models (`DeepLabV3-ResNet50`, `Qwen2.5-VL-3B/7B-Instruct`) as-is without training or fine-tuning them on the `sidewalk-semantic` dataset itself.
+  
+- Both Qwen2.5-VL models were run with 4-bit quantization to speed up inference and fit available GPU memory (Colab T4, 16GB), which may affect output quality/precision compared to full-precision inference.
+  
+- We assessed the safety of the sidewalk images qualitatively through the VLMs, without validating quantitatively through standard metrics such as mIoU score or IRR (Inter-Rater Reliability).
 
-- Our findings were based on 3 sample images. A larger sample would be needed to quantify these findings.
+## Future Work
 
-- Both Qwen2.5-VL models were run with 4-bit quantization to fit available GPU memory (Colab T4, 16GB), which may affect output quality/precision compared to full-precision inference.
-
+- Instead of using a generic pre-trained segmentation model such as `DeepLabV3-ResNet50`, we can experiment with a sidewalk-focused segmentation framework like CitySurfaces that was trained on sidewalk images from New York City and Boston. [CitySurfaces: City-Scale Semantic Segmentation of Sidewalk Materials](https://arxiv.org/abs/2201.02260)
+  
+- As of right now, we run these two pipelines independently, but our findings have shown the VLM's lack of spatial awareness can be supplemented by a segmentation model's fine-grained spatial localization. A future work can integrate detection and segmentation into a single pipeline using tools such as Grounded-SAM that allows to segment images using natural-language. [Grounded-SAM in 2026: Why It Still Matters (Even in the SAM3 Era)?](https://eng-mhasan.medium.com/grounded-sam-in-2026-why-it-still-matters-even-in-the-sam3-era-15315532365a) [Grounded SAM: Assembling Open-World Models for Diverse Visual Tasks](https://arxiv.org/abs/2401.14159)
