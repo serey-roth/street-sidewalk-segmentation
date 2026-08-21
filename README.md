@@ -62,7 +62,7 @@ Figure 3: VLM Safety Assessment with Qwen2.5-VL-7B-Instruct
   
 - Both Qwen2.5-VL models were run with 4-bit quantization to speed up inference and fit available GPU memory (Colab T4, 16GB), which may affect output quality/precision compared to full-precision inference.
   
-- We assessed the safety of the sidewalk images qualitatively through the VLMs, without validating quantitatively through standard metrics such as mIoU score or IRR (Inter-Rater Reliability).
+- We assessed the safety of the sidewalk images qualitatively through the VLMs, without validating quantitatively through standard metrics such as mIoU score.
 
 ## Future Work
 
