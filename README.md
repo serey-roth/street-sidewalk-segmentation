@@ -1,7 +1,7 @@
-# Dual-Pipeline Analysis for Pedestrian Sidewalk Safety with DeepLabV3 Segmentation and Qwen2.5-VL Safety Assessment
+# Dual-Pipeline Analysis for Pedestrian Sidewalk Safety with DeepLabV3 Image Segmentation and Qwen2.5-VL Safety Assessment
 
 ## Overview
-Pre-trained segmentation models, such as DeepLabV3+, are effective at classifying pixel-level details, but are limited to categories in their original training data. Fine-tuning the models to recognize new categories is a possible solution, though it requires annotated training labels for the target images. Vision-Language Models (VLMs) are effective at identifying "what's in an image" through natural-language processing, but are limited due to a lack of spatial reasoning. [Can Vision-Language Models Reason about AI Edits in Images?](https://arxiv.org/html/2607.28464v1) [MINGLE: VLMs for Semantically Complex Region Detection in Urban Scenes](https://arxiv.org/abs/2509.13484)
+Pre-trained segmentation models, such as DeepLabV3+, are effective at classifying pixel-level details, but are limited to categories in their original training data. Fine-tuning the models to recognize new categories is a possible solution, though it requires annotated training labels for the target images. Vision-Language Models (VLMs) are effective at identifying "what's in an image" through natural-language processing, but are limited due to a lack of spatial reasoning. [MINGLE: VLMs for Semantically Complex Region Detection in Urban Scenes](https://arxiv.org/abs/2509.13484)
 
 
 This project combines those two approaches into an analysis pipeline for pedestrian sidewalk safety. First, we run pre-trained semantic segmentation with DeepLabV3+ and then perform VLM-based safety assessment with Qwen2.5-VL models. The goal is to evaluate how accurately general-purpose VLMs examine pedestrian sidewalk quality and to what extent they can complement segmentation models in fine-grained scene understanding. 
@@ -11,7 +11,7 @@ For our analysis, we use HuggingFace's `segments/sidewalk-semantic` [dataset](ht
 ## Findings
 
 ### DeepLabV3-segmented classes vs. Pre-labeled classes
-We evaluated `DeepLabV3-ResNet50` model, which is trained on COCO/Pascal VOC's 20 general object classes, against the `sidewalk-semantic` dataset labels (34 sidewalk-specific classes e.g. `flat-walk`, `flat-curb`, `flat-crosswalk`).
+We evaluated `DeepLabV3-ResNet50` model, which is trained on COCO/Pascal VOC's 20 general object classes, against the `sidewalk-semantic` dataset labels (34 sidewalk-specific classes e.g. `flat-sidewalk`, `flat-curb`, `flat-crosswalk`).
 
 Across 3 sample images, we found that the model identified only `background` and `car` and none of the sidewalk-relevant classes (such as `flat-curb`, `flat-road`, `flat-parkingdriveway`, `nature-vegetation`, etc). 
 
