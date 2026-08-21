@@ -49,7 +49,7 @@ Respond ONLY in this exact JSON format, no other text:
 }"""
 ```
 
-<img width="951" height="467" alt="Screenshot 2026-08-20 at 2 14 09 PM" src="https://github.com/user-attachments/assets/5846497a-3935-4c18-9182-fa15d42fe89a" />
+<img width="954" height="479" alt="Screenshot 2026-08-20 at 5 35 09 PM" src="https://github.com/user-attachments/assets/8d2c88d3-a6b5-4e75-96ce-34a4613a9f31" />
 
 ## Limitations
 
