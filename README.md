@@ -16,16 +16,11 @@ We evaluated `DeepLabV3-ResNet50` model, which is trained on COCO/Pascal VOC's 2
 Across 3 sample images, we found that the model identified only `background` and `car` and none of the sidewalk-relevant classes (such as `flat-curb`, `flat-road`, `flat-parkingdriveway`, `nature-vegetation`, etc). 
 
 <img width="954" height="300" alt="Screenshot 2026-08-20 at 2 13 46 PM" src="https://github.com/user-attachments/assets/eef233ff-f713-490f-8c28-eedceea09ee2" />
+Figure 1: Semantic Segmentation with DeepLabV3-ResNet50
 
 ### VLM-based safety assessment with Qwen2.5-VL
 We evaluated 2 Qwen2.5-VL models (`Qwen2.5-VL-3B-Instruct` and `Qwen2.5-VL-7B-Instruct`) on three scores per image: `perceived_safety`, `lighting_quality`, and `obstructions`, using a structured JSON prompt.
 
-We found that
-- Adding spatial reference and defining the walkable surface from the pedestrian POV improved obstruction accuracy and got rid of hallucinated obstructions (e.g. flagging garden wall as blocking the path)
-- The 3B model misidentified the orange pole as an obstruction in the first image even though it's faraway in the distance
-- The 3B model scored pretty low (2/5) across all 3 sample images, even though pictures are well-lit and bright
-
-This is the final iteration of the prompt:
 ```
 prompt = """
 Analyze the given sidewalk image, which is shown from a pedestrian's eye-level view.
@@ -50,7 +45,16 @@ Respond ONLY in this exact JSON format, no other text:
 }"""
 ```
 
+We found that
+- Adding spatial reference and defining the walkable surface from the pedestrian POV improved obstruction accuracy and got rid of hallucinated obstructions (e.g. flagging garden wall as blocking the path)
+- The 3B model identified minor obstructions such as cracks and scattered leaves that might affect the pedestrian safety, whereas the 7B model captured none. 
+- The 3B model scored pretty low on lighting quality (2/5) across all 3 sample images, even though pictures are well-lit and bright
+
+<img width="958" height="478" alt="Screenshot 2026-08-20 at 5 53 56 PM" src="https://github.com/user-attachments/assets/e5b6d1c5-4f71-448b-9eae-37f294c0fe47" />
+Figure 2: VLM Safety Assessment with Qwen2.5-VL-3B-Instruct
+
 <img width="954" height="479" alt="Screenshot 2026-08-20 at 5 35 09 PM" src="https://github.com/user-attachments/assets/8d2c88d3-a6b5-4e75-96ce-34a4613a9f31" />
+Figure 3: VLM Safety Assessment with Qwen2.5-VL-7B-Instruct
 
 ## Limitations
 
